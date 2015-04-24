@@ -1,0 +1,178 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+    <script>
+
+
+        function Top(x, y, dx, dy, radius) {
+            this.x = x;
+            this.y = y;
+            this.dx = dx; //gideceği yönler
+            this.dy = dy;
+            this.radius = radius;
+            this.strokeColor = "black";
+            this.fillColor = "red";
+        }
+
+
+        var toplar = [];
+
+        var canvas;
+        var context;
+
+        window.onload = function () {
+            canvas = document.getElementById("canvas");
+            context = canvas.getContext("2d");
+
+            canvas.onmousedown = canvasClick;
+
+
+            setTimeout("FrameCiz()", 20);
+        }
+
+        function topekle() {
+
+            var radius = parseFloat(document.getElementById("topboyutu").value);
+
+
+            var top = new Top(50, 50, 1, 1, radius);
+
+
+            toplar.push(top);
+
+
+            document.getElementById("backgroundMusic").play();
+        }
+
+        function toplaritemizle() {
+
+            toplar = [];
+
+
+            document.getElementById("backgroundMusic").pause();
+            document.getElementById("backgroundMusic").currentTime = 0;
+        }
+
+
+        function FrameCiz() {
+
+            context.clearRect(0, 0, canvas.width, canvas.height);
+
+            context.beginPath();
+            for (var i in toplar) {
+
+                var top = toplar[i];
+                top.x += top.dx;
+                top.y += top.dy;
+
+
+                if ((top.y) < canvas.height) top.dy += 0.22;
+
+
+                top.dx = top.dx * 0.998;
+
+
+                if ((top.x + top.radius > canvas.width) || (top.x - top.radius < 0)) {
+                    boing();
+                    top.dx = -top.dx;
+                }
+
+
+                if ((top.y + top.radius > canvas.height) || (top.y - top.radius < 0)) {
+                    boing();
+                    top.dy = -top.dy * 0.96;
+                }
+
+
+                if (!document.getElementById("ilisikilitoplar").checked) {
+                    context.beginPath();
+                    context.fillStyle = top.fillColor;
+                }
+                else {
+                    context.fillStyle = "white";
+                }
+
+
+                context.arc(top.x, top.y, top.radius, 0, Math.PI * 2);
+                context.lineWidth = 1;
+                context.fill();
+                context.stroke();
+            }
+
+
+            setTimeout("FrameCiz()", 20);
+        }
+
+        function canvasClick(e) {
+
+            var clickX = e.pageX - canvas.offsetLeft;
+            var clickY = e.pageY - canvas.offsetTop;
+
+
+            for (var i in toplar) {
+                var top = toplar[i];
+                if ((clickX > (top.x - top.radius)) && (clickX < (top.x + top.radius))) {
+                    if ((clickY > (top.y - top.radius)) && (clickY < (top.y + top.radius))) {
+
+                        top.dx -= 2;
+                        top.dy -= 3;
+                        return;
+                    }
+                }
+            }
+        }
+
+        var audiotoplam = 3;
+        var audioSiraNo = 1;
+
+        function boing() {
+
+            var audioElementName = "audio" + audioSiraNo;
+            var audio = document.getElementById(audioElementName);
+
+            audio.currentTime = 0;
+            audio.play();
+
+            if (audioSiraNo == audiotoplam) {
+                audioSiraNo = 1;
+            }
+            else {
+                audioSiraNo += 1;
+            }
+        }
+    </script>
+
+
+</head>
+<body>
+    <audio id="audio1">
+        <source src="kaynaklar/boing1.wav" type="audio/wav" />
+        <source src="kaynaklar/beep.mp3" type="audio/mp3" />
+    </audio>
+    <audio id="audio2">
+        <source src="kaynaklar/boing2.wav" type="audio/wav" />
+        <source src="kaynaklar/beep.mp3" type="audio/mp3">
+    </audio>
+    <audio id="audio3">
+        <source src="kaynaklar/boing3.wav" type="audio/wav" />
+        <source src="kaynaklar/beep.mp3" type="audio/mp3" />
+    </audio>
+
+    <audio id="backgroundMusic" loop>
+        <source src="kaynaklar/theowlnamedorion.mp3" type="audio/mp3" />
+        <source src="kaynaklar/theowlnamedorion.ogg" type="audio/ogg" />
+    </audio>
+
+    <canvas id="canvas" width="400" height="300"></canvas>
+
+    <div>
+        <button onclick="topekle()">Add top</button>
+        <button onclick="toplaritemizle()">Clear Canvas</button>
+    </div>
+    <div>
+        top Size:<input id="topboyutu" type="number" min="0" max="50" value="15">
+        <input id="ilisikilitoplar" type="checkbox">Connect toplar<br>
+    </div>
+</body>
+</html>
